@@ -2,8 +2,17 @@
 
 class Robot: public IterativeRobot
 {
+public:
+	Robot() :
+		talonTest(0),
+		solenoidTest(4)
+	{
+	}
 private:
 	LiveWindow *lw;
+	Talon talonTest;
+	Solenoid solenoidTest;
+
 	int counter;
 
 	void RobotInit()
@@ -34,6 +43,8 @@ private:
 			Wait(2.0);
 			counter++;
 
+			bool currentSetting = solenoidTest.Get();
+			solenoidTest.Set(!currentSetting);
 		}
 	}
 

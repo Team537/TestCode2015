@@ -4,6 +4,7 @@ class Robot: public IterativeRobot
 {
 private:
 	LiveWindow *lw;
+	int counter;
 
 	void RobotInit()
 	{
@@ -22,12 +23,18 @@ private:
 
 	void TeleopInit()
 	{
-
+		counter = 0;
 	}
 
 	void TeleopPeriodic()
 	{
-		// this is a test
+		while(IsEnabled())
+		{
+			// this is a test
+			Wait(2.0);
+			counter++;
+
+		}
 	}
 
 	void TestPeriodic()

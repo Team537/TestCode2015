@@ -4,7 +4,7 @@ class Robot: public IterativeRobot
 {
 public:
 	Robot() :
-		talonTest(0),
+		talonTest(1),
 		solenoidTest(4)
 	{
 	}

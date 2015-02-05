@@ -2,7 +2,8 @@
 #include "WPILib.h"
 #include "cmath"
 
-DoublePot::DoublePot(int channel, float min, float max, float Offset) : AnalogPotentiometer(channel) {
+DoublePot::DoublePot(int channel,double fullRange, double offset, float min, float max, float Offset, std::string name) : AnalogPotentiometer(channel,  fullRange, offset)
+{
 	Min = min;
 	Max = max;
 	OFFSet = Offset;
@@ -11,6 +12,11 @@ DoublePot::DoublePot(int channel, float min, float max, float Offset) : AnalogPo
 	lastdeltasign = false;
 	accum = 0;
 	alternater = false;
+	oversampleAcc = 0;
+	Name = name;
+
+	for (int i = 0; i < OVERSAMPLE; i++)
+		data[i] = 0;
 };
 
 double DoublePot::PIDGet()
@@ -21,19 +27,50 @@ double DoublePot::PIDGet()
 	double tmpIntPart, tmpAccum;
 	bool deltaIsPositive = delta > 0;
 	
-	if (originalreading > Max || originalreading <Min)
+	double sum = 0;
+
+	if (delta > 300) // makes sure that when looping past reset point it doesn't go backwards
 	{
-		return lastval;
+		//return lastval;
+		originalreading = lastval;
 	}
 	lastval = originalreading;
-	originalreading -= OFFSet;
-	if (originalreading < Min)
+	originalreading += OFFSet;
+	if (originalreading > Max)
+		originalreading -= range;
+	if (originalreading  < Min)
+	{
 		originalreading += range;
+	}
+	// Insert oversample code
+
+
+	for (int i = OVERSAMPLE - 1; i > 0; i--)
+		data[i-1] = data[i];
+	data[OVERSAMPLE - 1] = originalreading;
+
+	oversampleAcc++;
+
+	char buff[1024];
+	char temp[32];
+	sprintf(buff,"Oversample");
+	if (oversampleAcc >= OVERSAMPLE){
+		for (int i = 0; i < OVERSAMPLE; i++)
+		{
+			sum += data[i];
+			sprintf(temp,"[%i]=%f,",i,data[i]);
+			strcat(buff,temp);
+		}
+		SmartDashboard::PutString(Name +"Oversample", buff);
+		return sum / OVERSAMPLE;
+	}
+
 	return originalreading;
 	
 	SmartDashboard::PutBoolean("Alternater", alternater);
 	SmartDashboard::PutNumber("originalreading", originalreading);
 	SmartDashboard::PutNumber("accum", accum);
+
 
 	// Update the accumulator with the current change in angle
 	//accum += delta;
@@ -70,4 +107,11 @@ double DoublePot::PIDGet()
 	return(tmpAccum);*/
 	
 
+}
+
+double DoublePot::getAverage(){
+	double sum = 0;
+	for (int i = 0; i < OVERSAMPLE; i++)
+		sum += data[i];
+	return sum / OVERSAMPLE;
 }

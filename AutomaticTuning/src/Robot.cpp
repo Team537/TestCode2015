@@ -1,18 +1,20 @@
 #include "WPILib.h"
-#include "swerve/Swerve.h"
+#include "Autotune.h"
 
 class Robot: public IterativeRobot
 {
 private:
 	LiveWindow *lw;
-	Joystick *controller;
-	Swerve *swerve;
+	Victor *AngleVictor;
+	AnalogPotentiometer *AnglePot;
+	PID_ATune *Autotune;
 
 	void RobotInit()
 	{
 		lw = LiveWindow::GetInstance();
-		controller = new Joystick(0);
-		swerve = new Swerve(controller);
+		AngleVictor = new Victor (15);
+		AnglePot = new AnalogPotentiometer(5);
+		Autotune = new PID_ATune(AnglePot, AngleVictor);
 	}
 
 	void AutonomousInit()
@@ -27,18 +29,17 @@ private:
 
 	void TeleopInit()
 	{
-		swerve->Initialize();
+
 	}
 
 	void TeleopPeriodic()
 	{
-		swerve->Run();
+
 	}
 
 	void TestPeriodic()
 	{
 		lw->Run();
-		swerve->TestMode();
 	}
 };
 

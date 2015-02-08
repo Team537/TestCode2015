@@ -48,6 +48,7 @@ void SwerveModule::drive(float angle, float speed)
 	}
 	SmartDashboard::PutNumber("max encoder rate", maxencrate);
 	//AngleOutput->Set(angle);
+	SpeedOutput->Set(.5*speed);
 	//PIDDrive->SetSetpoint(speed*MaxRate);
 	/*double potfeedback = AnglePotentiometer->PIDGet();
 		if (potfeedback >= potfeedbackmax){
@@ -60,41 +61,32 @@ void SwerveModule::drive(float angle, float speed)
 	//SmartDashboard::PutNumber("min pot", potfeedbackmin);
 	//SmartDashboard::PutNumber(Name + "Potval", potfeedback);
 	SmartDashboard::PutNumber("Encoder", SpeedEncoder->GetRate());
-	SmartDashboard::PutNumber("Potentiometer", AnglePotentiometer->Get());
+	SmartDashboard::PutNumber(Name +"Potentiometer", AnglePotentiometer->Get());
 	SmartDashboard::PutNumber("Angle IO",angle);
 	SmartDashboard::PutNumber("Speed IO",speed);
 }
 
 void SwerveModule::AutoDrive(float Angle)
 {
-	if (firsttime == true)
-	{
-		watch.Reset();
-		watch.Start();
-		firsttime = false;
-	}
-	if (watch.Get() < 3)
-	{
-		Angle = 165;
-	}
-	if (watch.Get() > 3)
-	{
-		watch.Stop();
-	}
+	Angle = (Angle/360)*330 + 15;
 	//SmartDashboard::PutNumber(Name+"actual I",((PIDAngle->GetI())*1000));
 	Angle += Offset;
-	Angle +=range;
+	Angle += range;
 	if (Angle > MAX)
 		Angle -= range;
 	if (Angle < MIN)
 		Angle += range;
 	SmartDashboard::PutNumber(Name+ "Angle Setpoint pre cap", Angle);
-	if(Angle > 300)
+/*	if(Angle > 300)
 		Angle = 300;
 	if (Angle < 90)
-		Angle = 90;
+		Angle = 90;*/
 	PIDAngle->Enable();
 	PIDAngle->SetSetpoint(Angle);
+	if(AngleOutput->Get() > 0)
+	{
+		PIDAngle->SetSetpoint(Angle - offSet);
+	}
 	SmartDashboard::PutNumber(Name+ "PotReading", AnglePotentiometer->PIDGet());
 	SmartDashboard::PutNumber(Name+ "Angle Error", PIDAngle->GetError());
 	SmartDashboard::PutNumber(Name+ "Angle Setpoint", PIDAngle->GetSetpoint());
@@ -108,6 +100,7 @@ void SwerveModule::PIDAdjust(float P, float I, float D)
 	SmartDashboard::PutNumber(Name+ "P", PIDAngle->GetP()*1000);
 	SmartDashboard::PutNumber(Name+ "I", ((PIDAngle->GetI())*1000));
 	SmartDashboard::PutNumber(Name+ "D", PIDAngle->GetD()*1000);
+	SmartDashboard::PutNumber(Name+ "setpoint offset", offSet);
 	PIDAngle->SetPID(P, I, D);
 }
 
@@ -119,8 +112,20 @@ void SwerveModule::ReadPot(){
 	SmartDashboard::PutNumber(Name+ " Initial Pot Reading", AnglePotentiometer->PIDGet());
 	
 }
-
-
+void SwerveModule::Reset()
+{
+	PIDAngle->Reset();
+}
+void SwerveModule::offSetAdjust(int a, int b){
+	if (a)
+	{
+		offSet += 1;
+	}
+	if (b)
+	{
+		offSet -= 1;
+	}
+}
 PIDController* SwerveModule::GetAnglePID()
 {
 	return PIDAngle;

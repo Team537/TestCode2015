@@ -22,7 +22,7 @@ private:
 	Timer watch;
 	double MaxRate;
 public:
-	SwerveModule(uint32_t SpeedPort, uint32_t AngPort, uint32_t EncPort1, uint32_t EncPort2,uint32_t PotPort, PIDValue *AnglePIDValues, PIDDriveValue *DrivePIDValues,std::string name, float offset, double MAXRate)
+	SwerveModule(uint32_t SpeedPort, uint32_t AngPort, uint32_t EncPort1, uint32_t EncPort2,uint32_t PotPort, PIDValue *AnglePIDValues, PIDDriveValue *DrivePIDValues,std::string name, float offset, double MAXRate, float OFFSETsetpoint)
 	{
 		SpeedOutput = new Victor(SpeedPort);
 		SpeedEncoder = new Encoder(EncPort1,EncPort2, false, Encoder::EncodingType::k4X);
@@ -38,7 +38,7 @@ public:
 		PIDAngle->SetAbsoluteTolerance(15); // shetc="string"; shetch.slice(1, 4)
 		potfeedbackmin = 100;
 		potfeedbackmax = 100;
-		PIDAngle->SetContinuous(false);
+		PIDAngle->SetContinuous(true);
 		MIN = AnglePIDValues->MINInput;
 		MAX = AnglePIDValues->MAXInput;
 		toggle = true;
@@ -51,11 +51,13 @@ public:
 		firsttime = true;
 		SpeedEncoder->SetDistancePerPulse(.05026548);
 		maxencrate = 10;
+		offSet = OFFSETsetpoint;
 
 	}
 	void Initialize();
 	void drive(float angle, float speed);
 	void AutoDrive(float Angle);
+	void offSetAdjust(int a, int b);
 	void PIDAdjust(float P, float I, float D);
 	bool AtAngle();
 	bool toggle;
@@ -65,6 +67,7 @@ public:
 	float Oldreading;
 	bool firsttime;
 	double maxencrate;
-
+	float offSet;
+	void Reset();
 };
 #endif

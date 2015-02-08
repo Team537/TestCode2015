@@ -10,6 +10,7 @@ class PID_ATune
   public:
   //commonly used functions **************************************************************************
     PID_ATune(PIDSource * source, PIDOutput *Output);                       	// * Constructor.  links the Autotune to a given PID
+    void InitializeRuntime(float);
     int Runtime();						   			   	// * Similar to the PID Compue function, returns non 0 when done
 	void Cancel();									   	// * Stops the AutoTune
 
@@ -52,7 +53,9 @@ class PID_ATune
 	float absMax, absMin;
 	float oStep;
 	float outputStart;
+	float outputCurrent;
 	float Ku, Pu;
+	int i;
 
 };
 #endif

@@ -29,7 +29,7 @@ public:
 		AngleOutput = new Victor(AngPort);
 		AnglePotentiometer = new DoublePot(PotPort,360,0, AnglePIDValues->MINInput, AnglePIDValues->MAXInput,0, name);
 		Name = name;
-		PIDAngle = new PIDController(AnglePIDValues->P,AnglePIDValues->I,AnglePIDValues->D,AnglePotentiometer,AngleOutput);
+		PIDAngle = new PIDController(AnglePIDValues->P,AnglePIDValues->I,AnglePIDValues->D,AnglePotentiometer,AngleOutput, .025);
 		PIDDrive = new PIDController(DrivePIDValues->P,DrivePIDValues->I,DrivePIDValues->D,SpeedEncoder,SpeedOutput);
 		PIDDrive->SetPID(DrivePIDValues->P,DrivePIDValues->I,DrivePIDValues->D,DrivePIDValues->F);
 		SpeedEncoder->SetPIDSourceParameter(PIDSource::kRate);
@@ -61,7 +61,7 @@ public:
 	void PIDAdjust(float P, float I, float D);
 	bool AtAngle();
 	bool toggle;
-	void ReadPot();
+	float ReadPot();
 	int lasttrigger;
 	PIDController* GetAnglePID();
 	float Oldreading;
@@ -69,5 +69,6 @@ public:
 	double maxencrate;
 	float offSet;
 	void Reset();
+	void DisablePID();
 };
 #endif

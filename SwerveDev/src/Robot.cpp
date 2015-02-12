@@ -7,10 +7,13 @@ private:
 	LiveWindow *lw;
 	Joystick *controller;
 	Swerve *swerve;
+	CameraServer *camera;
 
 	void RobotInit()
 	{
 		lw = LiveWindow::GetInstance();
+		camera = CameraServer::GetInstance();
+		camera->StartAutomaticCapture("cam0");
 		controller = new Joystick(0);
 		swerve = new Swerve(controller);
 	}

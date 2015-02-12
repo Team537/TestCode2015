@@ -3,6 +3,7 @@
 
 #include <swerve/PIDValue.h>
 #include <swerve/PIDDriveValue.h>
+#include <swerve/Autotune.h>
 #include "WPILib.h"
 #include "SwerveModule.h"
 
@@ -22,6 +23,7 @@ class Swerve
 {
 private:
 	SwerveModule *FrontLeftMod, *FrontRightMod, *BackLeftMod, *BackRightMod;
+	PID_ATune *automatic;
 	Joystick *Controller;
 	float AngleSetpoint, PChangeTest, p, i, d, NAngleSetpoint;
 	Timer newtime;
@@ -33,25 +35,26 @@ public:
 		Controller = controller;
 		LW = LiveWindow::GetInstance();
 			//
-		PIDValue *FrontLeftAngleValues  = new PIDValue(.0065,0.000065,.0014, 15, 345, -1,1);
-		PIDValue *FrontRightAngleValues = new PIDValue(.0066,0.000506,0.0062, 15, 345, -1, 1);
-		PIDValue *BackLeftAngleValues   = new PIDValue(.0066,0.00034, 0.006,15,345,-1,1);
-		PIDValue *BackRightAngleValues  = new PIDValue(.0079,0.000238,0.0033,15,345,-1,1);
+		PIDValue *FrontLeftAngleValues  = new PIDValue(.021,0.000250,.0425, 15, 345, -1,1);
+		PIDValue *FrontRightAngleValues = new PIDValue(.014,0.000320,0.035, 15, 345, -1, 1);
+		PIDValue *BackLeftAngleValues   = new PIDValue(.020,0.00017, 0.0401,15,345,-1,1);
+		PIDValue *BackRightAngleValues  = new PIDValue(.020,0.000210,0.0335,15,345,-1,1);
 		PIDDriveValue *FrontLeftDriveValues  = new PIDDriveValue(.004, 0, 0,0,0);
 		PIDDriveValue *FrontRightDriveValues = new PIDDriveValue(.004, 0, 0,0,0);
 		PIDDriveValue *BackLeftDriveValues   = new PIDDriveValue(.004, 0, 0,0,0);
 		PIDDriveValue *BackRightDriveValues  = new PIDDriveValue(.004, 0, 0,0,0);
+		automatic = new PID_ATune();
 		///                            (speed,angle,encoder1,encoder2,pot,pidAngle,PIDDrive,name,offset, Max Encoder rate, setpointoffset)
-		FrontLeftMod  = new SwerveModule(11,15,5,6,5, FrontLeftAngleValues, FrontLeftDriveValues,"FrontLeft", 0,10,0);
-		FrontRightMod = new SwerveModule(10,14,1,2,4,FrontRightAngleValues,FrontRightDriveValues,"FrontRight", 0,10,0);
-		BackLeftMod   = new SwerveModule(13,17,7,8,7,BackLeftAngleValues, BackLeftDriveValues,"BackLeft", 0,10,0);
-		BackRightMod  = new SwerveModule(12,16,3,4,6,BackRightAngleValues, BackRightDriveValues,"BackRight", 0,10,0);
+		FrontLeftMod  = new SwerveModule(11,15,16,17,5, FrontLeftAngleValues, FrontLeftDriveValues,"FrontLeft", 0,10,0);
+		FrontRightMod = new SwerveModule(10,14,14,15,4,FrontRightAngleValues,FrontRightDriveValues,"FrontRight", 0,10,0);
+		BackLeftMod   = new SwerveModule(13,17,24,25,7,BackLeftAngleValues, BackLeftDriveValues,"BackLeft", -29.941,10,0);
+		BackRightMod  = new SwerveModule(12,16,22,23,6,BackRightAngleValues, BackRightDriveValues,"BackRight", 0,10,0);
 
 		sign = 0;
 		NAngleSetpoint = 0;
 		AngleSetpoint = 90;
 		PChangeTest = 0;
-		p = .004;
+		p = .016;
 		i = 0;
 		d = 0;
 	}

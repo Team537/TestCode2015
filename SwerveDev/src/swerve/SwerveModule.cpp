@@ -46,7 +46,8 @@ void SwerveModule::drive(float angle, float speed)
 	{
 		maxencrate = crate;
 	}
-	SmartDashboard::PutNumber("max encoder rate", maxencrate);
+	SmartDashboard::PutNumber(Name + "crate", crate);
+	SmartDashboard::PutNumber(Name + "max encoder rate", maxencrate);
 	//AngleOutput->Set(angle);
 	SpeedOutput->Set(.5*speed);
 	//PIDDrive->SetSetpoint(speed*MaxRate);
@@ -108,13 +109,19 @@ bool SwerveModule::AtAngle()
 {
 	return PIDAngle->OnTarget();
 }
-void SwerveModule::ReadPot(){
+float SwerveModule::ReadPot(){
 	SmartDashboard::PutNumber(Name+ " Initial Pot Reading", AnglePotentiometer->PIDGet());
+	return AnglePotentiometer->PIDGet();
 	
 }
 void SwerveModule::Reset()
 {
 	PIDAngle->Reset();
+}
+
+void SwerveModule::DisablePID()
+{
+	PIDAngle->Disable();
 }
 void SwerveModule::offSetAdjust(int a, int b){
 	if (a)
@@ -130,3 +137,5 @@ PIDController* SwerveModule::GetAnglePID()
 {
 	return PIDAngle;
 }
+
+

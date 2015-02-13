@@ -15,21 +15,6 @@ void SwerveModule::Initialize()
 void SwerveModule::drive(float angle, float speed)
 {
 	SmartDashboard::PutBoolean("firsttime", firsttime);
-	/*if (firsttime == true)
-	{
-		watch.Reset();
-		watch.Start();
-		firsttime = false;
-	}
-	if (watch.Get() < 3)
-	{
-		toggle = true;
-		}
-	if (watch.Get() > 3)
-	{
-		toggle = false;
-		watch.Stop();
-	}*/
 	SmartDashboard::PutBoolean("toggle", toggle);
 	SmartDashboard::PutNumber("watch", watch.Get());
 	if (fabs(angle) < JOYDEADBAND)
@@ -49,18 +34,7 @@ void SwerveModule::drive(float angle, float speed)
 	SmartDashboard::PutNumber(Name + "crate", crate);
 	SmartDashboard::PutNumber(Name + "max encoder rate", maxencrate);
 	//AngleOutput->Set(angle);
-	SpeedOutput->Set(.5*speed);
-	//PIDDrive->SetSetpoint(speed*MaxRate);
-	/*double potfeedback = AnglePotentiometer->PIDGet();
-		if (potfeedback >= potfeedbackmax){
-			potfeedbackmax = potfeedback;
-			}
-		if (potfeedback <= potfeedbackmin){
-			potfeedbackmin = potfeedback;
-			}*/
-	//SmartDashboard::PutNumber("max pot", potfeedbackmax);
-	//SmartDashboard::PutNumber("min pot", potfeedbackmin);
-	//SmartDashboard::PutNumber(Name + "Potval", potfeedback);
+	PIDDrive->SetSetpoint(.5*speed*MaxRate);
 	SmartDashboard::PutNumber("Encoder", SpeedEncoder->GetRate());
 	SmartDashboard::PutNumber(Name +"Potentiometer", AnglePotentiometer->Get());
 	SmartDashboard::PutNumber("Angle IO",angle);
@@ -137,5 +111,20 @@ PIDController* SwerveModule::GetAnglePID()
 {
 	return PIDAngle;
 }
+void SwerveModule::PIDAuto(float distance)
+{
+	SpeedEncoder->SetPIDSourceParameter(PIDSource::kDistance);
+	PIDDriveDistance->Disable();
+	PIDDriveDistance->SetSetpoint(distance);
+}
+bool SwerveModule::GetDistancePID()
+{
+	SmartDashboard::PutBoolean("Distance on Target", PIDDriveDistance->OnTarget());
+	return PIDDriveDistance->OnTarget();
+}
 
+void SwerveModule::DistancePIDDisable()
+{
+	PIDDriveDistance->Disable();
+}
 
